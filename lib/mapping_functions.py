@@ -91,12 +91,15 @@ def make_map_figure(proj, extent, panel_labels,
                     shps, shp_colors, shp_ls, shp_lws,
                     dem_min=-1000, dem_max=5000,
                     cmap=matplotlib.cm.get_cmap('coolwarm'),
-                    long_ticks=[0.0, 5.0, 10.0, 15.0, 20.0], 
-                    lat_ticks=[42.0, 44.0, 46.0, 48.0, 50.0],
+                    long_ticks=None, 
+                    lat_ticks=None,
                     fs_legend='small',
                     mark_highest_value=True,
-                   n_highest=2,
-                   add_histo=True):
+                    n_highest=2,
+                    add_histo=True,
+                    histo_loc='lower right',
+                    add_inset_background=False,
+                    return_ax=False, s=40):
     
     
     fig = pl.figure(figsize=(10, 6))
@@ -120,22 +123,23 @@ def make_map_figure(proj, extent, panel_labels,
     print('creating color image')
     #dem[dem <= 0 ] = np.nan
     im = panel.pcolormesh(x_raster, y_raster, dem, 
-                          color=color_tuple, transform=proj, zorder=1)
+                          color=color_tuple, transform=proj, zorder=1, rasterized=True)
     
     # plot additional shapefiles
-    for shp, shp_color, shp_lsi, shp_lw in zip(shps, shp_colors, shp_ls, shp_lws):
-        panel.add_geometries(shp.geometry, crs=proj, facecolor='none', edgecolor=shp_color, ls=shp_lsi, lw=shp_lw)
+    if shps is not None:
+        for shp, shp_color, shp_lsi, shp_lw in zip(shps, shp_colors, shp_ls, shp_lws):
+            panel.add_geometries(shp.geometry, crs=proj, facecolor='none', edgecolor=shp_color, ls=shp_lsi, lw=shp_lw)
     
     vmin, vmax = vlim
     
     ind = np.isnan(z)
     leg_springs_nd = panel.scatter(x[ind], y[ind],
-                                   vmin=vmin, vmax=vmax, zorder=102, s=40, marker='o',
+                                   vmin=vmin, vmax=vmax, zorder=102, s=s, marker='o',
                                    facecolor='None', edgecolor='black', transform=proj)
 
     ind = np.isnan(z) == False
     leg_springs = panel.scatter(x[ind], y[ind], c=z[ind],
-                                vmin=vmin, vmax=vmax, zorder=103, s=40, marker='o',
+                                vmin=vmin, vmax=vmax, zorder=103, s=s, marker='o',
                                 cmap=cmap, facecolor='none', transform=proj, lw=1.5)
     
     leg_springs.set_facecolor('none')
@@ -156,7 +160,8 @@ def make_map_figure(proj, extent, panel_labels,
         
         if (len(xs) == 2) & (xs[1] == xs[0]) & (ys[1] == ys[0]):
             tekst = '1,2'
-            panel.text(xs[0], ys[0] + 0.15, tekst, va='bottom', ha='center', weight='bold', transform=proj, fontsize='xx-large', zorder=105, color=maxcol)      
+            panel.text(xs[0], ys[0] + 0.15, tekst, va='bottom', ha='center', weight='bold', transform=proj, fontsize='xx-large', zorder=105, color=maxcol)
+            
         else:
             for j, xi, yi in zip(itertools.count(), xs, ys):
                 print('tekst: ', j, xi, yi + 0.1)
@@ -171,12 +176,16 @@ def make_map_figure(proj, extent, panel_labels,
                                             facecolor='lightblue', zorder=101)
     panel.add_feature(sea_50m)
     
-    
-    gl = panel.gridlines(xlocs=long_ticks, 
-                         ylocs=lat_ticks,
-                         crs=proj, zorder=2001, linestyle=':', 
-                         draw_labels=True)
-    
+    if long_ticks is not None and lat_ticks is not None:
+        gl = panel.gridlines(xlocs=long_ticks, 
+                             ylocs=lat_ticks,
+                             crs=proj, zorder=2001, linestyle=':', 
+                             draw_labels=True)
+    else:
+        gl = panel.gridlines(crs=proj, zorder=2001, linestyle=':', 
+                             draw_labels=True)
+        
+
     gl.xformatter = LONGITUDE_FORMATTER
     gl.yformatter = LATITUDE_FORMATTER
     gl.xlabels_top = False
@@ -201,7 +210,7 @@ def make_map_figure(proj, extent, panel_labels,
         inset_panel = inset_axes(panel,
                                  width="20%",  # width = 30% of parent_bbox
                                  height="25%",  # height : 1 inch
-                                 loc="lower right", borderpad=3.5)
+                                 loc=histo_loc, borderpad=3.5)
 
         inset_panel.tick_params(axis='both', which='major', labelsize=fs_legend)
         inset_panel.tick_params(axis='both', which='minor', labelsize=fs_legend)
@@ -221,10 +230,11 @@ def make_map_figure(proj, extent, panel_labels,
         widths = bins[1:] - bins[:-1]
         inset_panel.bar(bins[:-1] + widths/2.0, freq,
                         width=widths, color=colors, edgecolor=colors, linewidth=0)
-
-        #inset_panel.set_facecolor('lightgrey')
-        #inset_panel.set_axis_bgcolor("lightgrey")
-        #inset_panel.set_clip_on(False)
+        
+        if add_inset_background is True:
+            inset_panel.set_facecolor('lightgrey')
+            #inset_panel.set_axis_bgcolor("lightgrey")
+            #inset_panel.set_clip_on(False)
 
         #inset_panel.patch.set_alpha(0.75)
         #fig.tight_layout()
@@ -246,7 +256,10 @@ def make_map_figure(proj, extent, panel_labels,
     
     fig.tight_layout()
     
-    return fig
+    if return_ax is True:
+        return fig, panel
+    else:
+        return fig
 
 
 def get_concat_v(im1, im2):
