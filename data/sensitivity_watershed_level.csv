@@ -1,0 +1,5 @@
+level,number of watersheds with springs,median watershed area (km2),median min. surface temp. in watershed (degr. C),median max. elevation in watershed (m),median recharge temperature (degr. C),number of thermal springs
+12,164,147.2,1.217,2150,4.047,310
+10,159,167.1,1.217,2165,4.046,313
+9,137,382.9,0.3042,2333,3.621,317
+8,105,1034,-0.004167,2389,3.185,330

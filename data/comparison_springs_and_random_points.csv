@@ -1,0 +1,7 @@
+variable,n springs,n random points,median springs,median random points,p-value Kolmogorov-Smirnov,p-value Mann-Whitney U
+elevation,289,5000,655,1068,8.15e-19,6.864e-22
+ws_relief,289,4997,1699,1681,0.02395,0.845
+recharge,289,5000,0.5501,0.5149,9.553e-05,0.09395
+surface_temp,289,4995,8.321,6.875,1.415e-14,2.334e-13
+gw_lvl_depth,289,4999,12.16,23.03,1.783e-09,9.554e-12
+fault_distance,289,5000,8970,1.447e+04,9.027e-07,0.002266
