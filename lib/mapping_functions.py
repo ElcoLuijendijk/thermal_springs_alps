@@ -7,7 +7,7 @@ import matplotlib.pyplot as pl
 import cartopy.feature as cfeature
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 
-from mpl_toolkits.axes_grid.inset_locator import inset_axes
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from matplotlib.patches import Rectangle
 
 from PIL import Image
@@ -84,13 +84,38 @@ def hillshade(data, scale=10.0, azdeg=165.0, altdeg=45.0):
     return intensity
 
 
+def plot_shaded_dem(panel, x_raster, y_raster, rgb, proj, zorder=1):
+
+    """
+    Plot an rgb image of a shaded elevation raster on a cartopy map panel
+
+    x_raster and y_raster are 2D arrays with the coordinates of each raster cell. The rows of
+    the raster can be ordered from north to south or from south to north.
+    """
+
+    dx = abs(x_raster[0, 1] - x_raster[0, 0])
+    dy = abs(y_raster[1, 0] - y_raster[0, 0])
+    extent = [x_raster.min() - dx / 2.0, x_raster.max() + dx / 2.0,
+              y_raster.min() - dy / 2.0, y_raster.max() + dy / 2.0]
+
+    if y_raster[0, 0] > y_raster[-1, 0]:
+        origin = 'upper'
+    else:
+        origin = 'lower'
+
+    im = panel.imshow(np.clip(rgb, 0.0, 1.0), origin=origin, extent=extent,
+                      transform=proj, zorder=zorder, interpolation='nearest')
+
+    return im
+
+
 def make_map_figure(proj, extent, panel_labels,
                     x_raster, y_raster, dem, 
                     x, y, z, vlim, class_int,
                     zlabel, hist_ylabel, legend_label, legend_label_nd, 
                     shps, shp_colors, shp_ls, shp_lws,
                     dem_min=-1000, dem_max=5000,
-                    cmap=matplotlib.cm.get_cmap('coolwarm'),
+                    cmap=matplotlib.colormaps['coolwarm'],
                     long_ticks=None, 
                     lat_ticks=None,
                     fs_legend='small',
@@ -113,17 +138,8 @@ def make_map_figure(proj, extent, panel_labels,
     print('calculating hillshade')
     rgb = set_shade(dem, cmap=matplotlib.cm.Greys_r, vmin=dem_min, vmax=dem_max)
 
-    # correct rgb array. not really sure why but otherwise the image isnt correct
-    rgb = rgb[:, :-1, :]
-
-    # convert rgb to tuple
-    color_tuple = np.array([rii for ri in rgb for rii in ri])
-    color_tuple = np.insert(color_tuple, 3, 1.0, axis=1)
-
     print('creating color image')
-    #dem[dem <= 0 ] = np.nan
-    im = panel.pcolormesh(x_raster, y_raster, dem, 
-                          color=color_tuple, transform=proj, zorder=1, rasterized=True)
+    im = plot_shaded_dem(panel, x_raster, y_raster, rgb, proj, zorder=1)
     
     # plot additional shapefiles
     if shps is not None:
@@ -142,7 +158,9 @@ def make_map_figure(proj, extent, panel_labels,
                                 vmin=vmin, vmax=vmax, zorder=103, s=s, marker='o',
                                 cmap=cmap, facecolor='none', transform=proj, lw=1.5)
     
+    # remove marker fill and color the marker edges using the colormap
     leg_springs.set_facecolor('none')
+    leg_springs.set_edgecolor(leg_springs.cmap(leg_springs.norm(z[ind])))
     
     if mark_highest_value is True:
         #indh = np.argmax(z[ind])
@@ -188,8 +206,8 @@ def make_map_figure(proj, extent, panel_labels,
 
     gl.xformatter = LONGITUDE_FORMATTER
     gl.yformatter = LATITUDE_FORMATTER
-    gl.xlabels_top = False
-    gl.ylabels_right = False
+    gl.top_labels = False
+    gl.right_labels = False
 
     panel.set_xlabel('Longitude')
     panel.set_ylabel('Latitude')
@@ -214,7 +232,7 @@ def make_map_figure(proj, extent, panel_labels,
 
         inset_panel.tick_params(axis='both', which='major', labelsize=fs_legend)
         inset_panel.tick_params(axis='both', which='minor', labelsize=fs_legend)
-        inset_panel.grid(b=False)
+        inset_panel.grid(False)
 
         bins = np.arange(vmin, vmax + class_int, class_int)
         freq, bins = np.histogram(z, bins=bins)
@@ -268,9 +286,13 @@ def get_concat_v(im1, im2):
     Merge two images
     """
     
-    dst = Image.new('RGB', (im1.width, im1.height + im2.height))
-    dst.paste(im1, (0, 0))
-    dst.paste(im2, (0, im1.height))
+    dst = Image.new('RGB', (max(im1.width, im2.width), im1.height + im2.height), 'white')
+
+    # use the alpha channel as mask, so that transparent pixels become white instead of black
+    for im, y in zip([im1, im2], [0, im1.height]):
+        im = im.convert('RGBA')
+        dst.paste(im, (0, y), im)
+
     return dst
 
 

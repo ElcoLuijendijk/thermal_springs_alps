@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Jupyter notebooks and a thermal spring database supporting Luijendijk et al. (2020, GRL, https://doi.org/10.1029/2020GL090134): using thermal springs to quantify deep groundwater flow and its thermal footprint in the Alps, with a comparison to North American orogens. There is no build system, test suite or package configuration. Work is done by running notebooks from the repository root, since all file paths are relative to it (except `additional_notebooks/`, which uses `../` paths).
 
-Dependencies: numpy, pandas, matplotlib, scipy, geopandas, shapely, rasterio, rasterstats, chardet, cartopy, pyproj, pillow, earthpy. Raster IO uses rasterio only; GDAL Python bindings (`osgeo`) are not needed. On this machine the conda env `geospatial` (`~/opt/anaconda3/envs/geospatial`) has everything installed.
+Dependencies are listed in `environment.yml` (conda-forge): numpy, pandas, scipy, matplotlib, geopandas, shapely, pyproj, rasterio, rasterstats, cartopy, pillow. Raster IO uses rasterio only; GDAL Python bindings (`osgeo`), earthpy and chardet are not needed. The code targets current versions (tested with numpy 2.2 and 2.5, pandas 2.2 and 3.0, matplotlib 3.10 and 3.11, geopandas 1.1 and 1.2); avoid APIs removed in these versions, such as `np.int`, `matplotlib.cm.get_cmap`, `mpl_toolkits.axes_grid`, `{'init': 'epsg:...'}` CRS dicts and chained assignment like `df.loc[i]['col'] = value`. Under pandas 3, arrays from `Series.values` are read-only, so copy them before modifying in place.
 
 Run a notebook headless with:
 
@@ -34,13 +34,12 @@ The spring database is published on PANGAEA (https://doi.org/10.1594/PANGAEA.916
 
 ## Shared code in `lib/`
 
-* `mapping_functions.py`: hillshading (`set_shade`, `hillshade`), the cartopy map layout `make_map_figure`, and image concatenation/cropping helpers used by the map notebooks.
+* `mapping_functions.py`: hillshading (`set_shade`, `hillshade`, and `plot_shaded_dem`, which draws the shaded rgb image with `imshow`), the cartopy map layout `make_map_figure`, and image concatenation/cropping helpers used by the map notebooks. Hollow colour-mapped scatter markers need explicit edge colours (`set_edgecolor(cmap(norm(z)))`); `set_facecolor('none')` alone makes them invisible.
 * `various_functions.py`: SiO2 geothermometers.
 
 Rasters are read with rasterio in the notebooks. `GIS_analysis_spring_data.ipynb` defines its own `read_raster_file` that returns `(array, dimensions, origin, cellsize, nodata, crs)`, where origin is the upper left corner and the y cellsize is negative; downstream cells index rasters using these values.
 
 ## Known caveats
 
-* Some notebooks still use deprecated APIs (`matplotlib.cm.get_cmap`, `mpl_toolkits.axes_grid`, `{'init': 'epsg:...'}` CRS dicts) and may need updates on newer library versions.
 * `calculate_heat_flux.ipynb` detects the encoding of its input CSV with `chardet`; the spring data and outputs of `GIS_analysis_spring_data.ipynb` are UTF-8 with BOM (`utf-8-sig`).
 * `google_earth_files_springs/` contains KML exports of the spring locations.
