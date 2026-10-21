@@ -8,13 +8,17 @@ Jupyter notebooks and a thermal spring database supporting Luijendijk et al. (20
 
 Dependencies are listed in `environment.yml` (conda-forge): numpy, pandas, scipy, matplotlib, geopandas, shapely, pyproj, rasterio, rasterstats, cartopy, pillow. Raster IO uses rasterio only; GDAL Python bindings (`osgeo`), earthpy and chardet are not needed. The code targets current versions (tested with numpy 2.2 and 2.5, pandas 2.2 and 3.0, matplotlib 3.10 and 3.11, geopandas 1.1 and 1.2); avoid APIs removed in these versions, such as `np.int`, `matplotlib.cm.get_cmap`, `mpl_toolkits.axes_grid`, `{'init': 'epsg:...'}` CRS dicts and chained assignment like `df.loc[i]['col'] = value`. Under pandas 3, arrays from `Series.values` are read-only, so copy them before modifying in place.
 
-Run a notebook headless with:
+Run the whole pipeline in order (creates `fig/`, writes executed copies to the gitignored `executed_notebooks/`, stops at the first failure; takes about 2 minutes):
 
 ```
-jupyter nbconvert --to notebook --execute --inplace <notebook>.ipynb
+python run_all.py
+python run_all.py calculate_heat_flux make_figures   # only selected notebooks
+python run_all.py --inplace                           # store outputs in the notebooks
 ```
 
-Figures are written to `fig/`, which is not tracked in git and must exist before running the figure notebooks. Running notebooks overwrites tracked files in `data/`; to check a change for regressions, run the notebook and compare the regenerated CSV against `git show HEAD:<file>`, then restore with `git checkout -- data`. The random points in `data/random_points_in_alps.csv` use a fixed seed (`random_seed` in the GIS notebook), so they are reproducible.
+The GitHub Actions workflow `.github/workflows/run_notebooks.yml` builds the conda env and runs `run_all.py` on every push to master and on pull requests, and uploads `fig/`, `data/*.csv` and the executed notebooks as an artifact. The committed notebooks are kept without outputs for `GIS_analysis_spring_data` and `calculate_heat_flux`.
+
+Running notebooks overwrites tracked files in `data/`; to check a change for regressions, run the notebook and compare the regenerated CSV against `git show HEAD:<file>`, then restore with `git checkout -- data`. The random points in `data/random_points_in_alps.csv` use a fixed seed (`random_seed` in the GIS notebook), so they are reproducible.
 
 ## Processing pipeline
 
@@ -36,10 +40,12 @@ The spring database is published on PANGAEA (https://doi.org/10.1594/PANGAEA.916
 
 * `mapping_functions.py`: hillshading (`set_shade`, `hillshade`, and `plot_shaded_dem`, which draws the shaded rgb image with `imshow`), the cartopy map layout `make_map_figure`, and image concatenation/cropping helpers used by the map notebooks. Hollow colour-mapped scatter markers need explicit edge colours (`set_edgecolor(cmap(norm(z)))`); `set_facecolor('none')` alone makes them invisible.
 * `various_functions.py`: SiO2 geothermometers.
+* `parameters.py`: values shared between notebooks (`year`, `temp_cutoff_thermal_springs`, `encoding`, `alps_outline_file`, `geospatial_data_file`); change shared values here, not in the notebooks.
 
 Rasters are read with rasterio in the notebooks. `GIS_analysis_spring_data.ipynb` defines its own `read_raster_file` that returns `(array, dimensions, origin, cellsize, nodata, crs)`, where origin is the upper left corner and the y cellsize is negative; downstream cells index rasters using these values.
 
 ## Known caveats
 
+* The readme has a version history; tag `v2.0` is the version of the published paper. When a change alters the results in `data/`, add it to the version history.
 * `calculate_heat_flux.ipynb` detects the encoding of its input CSV with `chardet`; the spring data and outputs of `GIS_analysis_spring_data.ipynb` are UTF-8 with BOM (`utf-8-sig`).
 * `google_earth_files_springs/` contains KML exports of the spring locations.
