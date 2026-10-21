@@ -5,19 +5,25 @@ This directory contains a series of notebooks that were used to analyse a databa
 
 ## Description
 
-* [GIS_analysis_spring_data.ipynb](GIS_analysis_spring_data.ipynb) parses the spring database to include only natural springs that are inside the Alps. The notebook also calculates some spatial statistics of the springs and the watersheds in which these springs are located using the hydrobasins dataset and several raster files that are located in the directory [GIS_data](GIS_data). The results are be saved as a new .csv file, which has the same filename of the original dataset but with ``_with_geospatial_data.csv`` appended to the filename
-* [analyze_spring_heat_flux_new](analyze_spring_heat_flux_new.ipynb) takes the output from the GIS_analysis notebook and calculates the contributing area, recharge temperature, circulation temperature and spring heat flux. The results will be saved as a new .csv file with ``_with_HF_estimates.csv`` appended to the filename
-* [make_figures.ipynb](make_figures.ipynb) was used to make all the figures for the manuscript. The figures are saved to the subdirectory [fig](fig).
-* [map_thermal_springs.ipynb](map_thermal_springs.ipynb) can be used to make a map of the thermal spring discharge & temperatures. The map is also saved to the subdirectory [fig](fig).
-* [analyze_background_heat_flow.ipynb](analyze_background_heat_flow.ipynb) was used to analyze the background heat flow in the Alps using data from the global heat flow database.
-* [compare_springs_with_NA.ipynb](compare_springs_with_NA.ipynb) was used to compare the spring discharge and heat flux of the Alps with published data for springs in North America (Ferguson & Grasby 2011, Geofluids).
+* [GIS_analysis_spring_data.ipynb](GIS_analysis_spring_data.ipynb) parses the spring database to include only natural springs that are inside the Alps. The notebook also calculates some spatial statistics of the springs and the watersheds in which these springs are located using the hydrobasins dataset and several raster files that are located in the directory [GIS_data](GIS_data). The results are saved as a new .csv file, which has the same filename of the original dataset but with ``_with_geospatial_data.csv`` appended to the filename.
+* [calculate_heat_flux.ipynb](calculate_heat_flux.ipynb) takes the output from the GIS_analysis notebook, removes non-thermal springs and calculates the contributing area, recharge temperature, circulation temperature and spring heat flux. The results are saved as a new .csv file with ``_with_HF_estimates.csv`` appended to the filename, and a summary of the results is saved to [data/summary_thermal_springs_data.csv](data/summary_thermal_springs_data.csv).
+* [make_figures.ipynb](make_figures.ipynb) was used to make all the figures for the manuscript. The figures are saved to the subdirectory fig.
+* [map_thermal_springs.ipynb](map_thermal_springs.ipynb) can be used to make a map of the thermal spring discharge and temperatures. The map is also saved to the subdirectory fig. Run make_figures.ipynb first, since this notebook combines the map with one of the figures made by make_figures.ipynb.
+* [background_heat_flow_Alps.ipynb](background_heat_flow_Alps.ipynb) was used to analyze the background heat flow in the Alps using data from the global heat flow database.
+* [background_heat_flow_NA.ipynb](background_heat_flow_NA.ipynb) was used to make a map of the background heat flow in North America.
+* [compare_orogens_v2.ipynb](compare_orogens_v2.ipynb) was used to compare the spring discharge and heat flux of the Alps with published data for springs in North America (Ferguson & Grasby 2011, Geofluids).
+* [additional_notebooks/merge_HF_datasets.ipynb](additional_notebooks/merge_HF_datasets.ipynb) was used to merge the SMU and global heat flow databases for North America into [data/heat_flow_NA_merged.csv](data/heat_flow_NA_merged.csv). The input files for this notebook are not included in this repository because of their size.
 
-The alps thermal spring database is located in the subdirectory data: [data/thermal_springs_alps_and_surroundings.csv](data/thermal_springs_alps_and_surroundings.csv)
+The notebooks should be run from the main directory of this repository. The subdirectory fig is not included in the repository and needs to be created before running the notebooks that make figures.
+
+The alps thermal spring database is located in the subdirectory data: [data/thermal_springs_alps.csv](data/thermal_springs_alps.csv). The database has also been published at PANGAEA: https://doi.org/10.1594/PANGAEA.916089
+
+The elevation data for North America in [GIS_data/etopo2022_bed_NA_5min.tif](GIS_data/etopo2022_bed_NA_5min.tif) were derived from the ETOPO 2022 global relief model (NOAA National Centers for Environmental Information, https://doi.org/10.25921/fd45-gt74), clipped to North America and resampled to a resolution of 5 arcminutes.
 
 
 ## Dependencies
 
-The notebooks requires a number of python packages: numpy, matplotlib, pandas, geopandas, scipy, rasterio, rasterstats, shapely 
+The notebooks require a number of python packages: numpy, matplotlib, pandas, geopandas, scipy, rasterio, rasterstats, shapely, cartopy, pyproj, pillow, chardet and earthpy.
 
 
 ## Authors
