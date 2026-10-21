@@ -20,7 +20,7 @@ Figures are written to `fig/`, which is not tracked in git and must exist before
 
 The notebooks form a chain where each step writes a CSV consumed by the next. Run in this order after changing upstream data or criteria:
 
-1. `GIS_analysis_spring_data.ipynb`: reads `data/thermal_springs_alps.csv`, keeps natural springs inside `GIS_data/outline_alps_final.shp`, and attaches watershed (HydroBASINS `eu_pfaf_gamma.shp`) and raster statistics (DEM, recharge, surface temperature, lithology, water table) using `rasterstats.zonal_stats`. Writes `data/thermal_springs_alps_with_geospatial_data.csv` (+ `.shp`) and the same for `data/random_points_in_alps` (used for data bias tests).
+1. `GIS_analysis_spring_data.ipynb`: downloads the spring data from PANGAEA (dataset 916086, tab-delimited text with a metadata header ending in `*/`) to `data/PANGAEA_916086_thermal_springs_alps.tab` (gitignored) if not present, renames the PANGAEA columns to the short names used by all notebooks (`long`, `lat`, `flow_rate_mean`, `temp_mean`, ...) and converts EC from mS/m to S/m. It then keeps natural springs inside `GIS_data/outline_alps_final.shp`, and attaches watershed (HydroBASINS `eu_pfaf_gamma.shp`) and raster statistics (DEM, recharge, surface temperature, lithology, water table) using `rasterstats.zonal_stats`. Writes `data/thermal_springs_alps_with_geospatial_data.csv` (+ `.shp`) and the same for `data/random_points_in_alps` (used for data bias tests).
 2. `calculate_heat_flux.ipynb`: filters out non-thermal springs (spring temperature must exceed the minimum watershed surface temperature by `temp_cutoff_thermal_springs`, following White 1957; rejects go to `data/non_thermal_springs.csv`), then computes contributing area (discharge / recharge), recharge and circulation temperatures (including SiO2 geothermometers from `lib/various_functions.py`), and spring heat flux. Writes `data/thermal_springs_alps_with_HF_estimates.csv`, `..._clean.csv`, and `data/summary_thermal_springs_data.csv`.
 3. Downstream consumers of the step 2 outputs:
    * `make_figures.ipynb`: manuscript figures.
@@ -30,7 +30,7 @@ The notebooks form a chain where each step writes a CSV consumed by the next. Ru
 
 The North America notebooks use `GIS_data/etopo2022_bed_NA_5min.tif` (ETOPO 2022, clipped to -170/-50/20/75 and resampled to 5 arcmin) for hillshading and `GIS_data/heat_flow_NA_nat_neighbour.tif` (interpolated background heat flow, no CRS set, used for zonal statistics per orogen).
 
-The spring database `data/thermal_springs_alps.csv` is also published on PANGAEA (https://doi.org/10.1594/PANGAEA.916089, child datasets 916086 for the compiled spring data and 916088 for the heat flux estimates). `data/thermal_springs_alps_and_surroundings.csv` is a byte-identical copy.
+The spring database is published on PANGAEA (https://doi.org/10.1594/PANGAEA.916089, child datasets 916086 for the compiled spring data and 916088 for the heat flux estimates). `data/thermal_springs_alps.csv` is the original compilation with full references; it is no longer read by any notebook. It differs from the PANGAEA version in a few rounded flow rates (up to 0.08 percent), a few decimal-comma values, and the absence on PANGAEA of the DOI, link and helium columns.
 
 ## Shared code in `lib/`
 
@@ -42,5 +42,5 @@ Rasters are read with rasterio in the notebooks. `GIS_analysis_spring_data.ipynb
 ## Known caveats
 
 * Some notebooks still use deprecated APIs (`matplotlib.cm.get_cmap`, `mpl_toolkits.axes_grid`, `{'init': 'epsg:...'}` CRS dicts) and may need updates on newer library versions.
-* Input CSV encodings vary; notebooks detect them with `chardet` before reading.
+* `calculate_heat_flux.ipynb` detects the encoding of its input CSV with `chardet`; the spring data and outputs of `GIS_analysis_spring_data.ipynb` are UTF-8 with BOM (`utf-8-sig`).
 * `google_earth_files_springs/` contains KML exports of the spring locations.

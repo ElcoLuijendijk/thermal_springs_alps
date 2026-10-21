@@ -16,7 +16,7 @@ This directory contains a series of notebooks that were used to analyse a databa
 
 The notebooks should be run from the main directory of this repository. The subdirectory fig is not included in the repository and needs to be created before running the notebooks that make figures.
 
-The alps thermal spring database is located in the subdirectory data: [data/thermal_springs_alps.csv](data/thermal_springs_alps.csv). The database has also been published at PANGAEA: https://doi.org/10.1594/PANGAEA.916089
+The Alps thermal spring database has been published at PANGAEA (https://doi.org/10.1594/PANGAEA.916089). [GIS_analysis_spring_data.ipynb](GIS_analysis_spring_data.ipynb) downloads the compiled spring data (https://doi.org/10.1594/PANGAEA.916086) to the subdirectory data the first time it is run, so an internet connection is needed for the first run. The original compilation, which contains the full references, is located in [data/thermal_springs_alps.csv](data/thermal_springs_alps.csv) but is not used by the notebooks.
 
 The elevation data for North America in [GIS_data/etopo2022_bed_NA_5min.tif](GIS_data/etopo2022_bed_NA_5min.tif) were derived from the ETOPO 2022 global relief model (NOAA National Centers for Environmental Information, https://doi.org/10.25921/fd45-gt74), clipped to North America and resampled to a resolution of 5 arcminutes.
 
