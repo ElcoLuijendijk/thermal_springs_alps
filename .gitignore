@@ -2,3 +2,4 @@ data/PANGAEA_*.tab
 fig/
 __pycache__/
 data/*.gpkg
+executed_notebooks/
