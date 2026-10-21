@@ -1,0 +1,19 @@
+name: thermal_springs_alps
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.11
+  - numpy>=2.0
+  - pandas>=2.2
+  - scipy
+  - matplotlib>=3.8
+  - geopandas>=1.0
+  - shapely>=2.0
+  - pyproj
+  - rasterio>=1.4
+  - rasterstats
+  - cartopy>=0.23
+  - pillow
+  - jupyterlab
+  - nbconvert
+  - ipykernel

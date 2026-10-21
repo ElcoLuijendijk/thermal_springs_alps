@@ -23,7 +23,28 @@ The elevation data for North America in [GIS_data/etopo2022_bed_NA_5min.tif](GIS
 
 ## Dependencies
 
-The notebooks require a number of python packages: numpy, matplotlib, pandas, geopandas, scipy, rasterio, rasterstats, shapely, cartopy, pyproj, pillow, chardet and earthpy.
+The notebooks require a number of python packages: numpy, pandas, scipy, matplotlib, geopandas, shapely, pyproj, rasterio, rasterstats, cartopy and pillow. The notebooks have been tested with Python 3.13 and 3.15, numpy 2.2 and 2.5, pandas 2.2 and 3.0, matplotlib 3.10 and 3.11, geopandas 1.1 and 1.2, shapely 2.1 and 2.2, rasterio 1.4 and 1.5, and cartopy 0.25 and 0.26.
+
+The easiest way to install all dependencies is to use conda (or mamba) with the environment file [environment.yml](environment.yml), which installs the packages from the conda-forge channel. Create the environment by running the following command from the main directory of this repository:
+
+```
+conda env create -f environment.yml
+```
+
+Activate the environment and start Jupyter Lab:
+
+```
+conda activate thermal_springs_alps
+jupyter lab
+```
+
+Alternatively, you can run a notebook without opening it in Jupyter, for example:
+
+```
+jupyter nbconvert --to notebook --execute --inplace GIS_analysis_spring_data.ipynb
+```
+
+If you have updated the environment file, you can update an existing environment using ``conda env update -f environment.yml --prune``. To remove the environment, use ``conda env remove -n thermal_springs_alps``.
 
 
 ## Authors
