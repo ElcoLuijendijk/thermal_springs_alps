@@ -1,6 +1,6 @@
 # Thermal springs Alps notebooks
 
-This directory contains a series of notebooks that were used to analyse a newly compiled database of thermal springs in the Alps for an upcoming manuscript (Luijendijk et al., 2020, https://doi.org/10.31223/osf.io/364dj).
+This directory contains a series of notebooks that were used to analyse a database of thermal springs in the Alps (Luijendijk et al., 2020, https://doi.org/10.1029/2020GL090134).
 
 
 ## Description
@@ -28,7 +28,7 @@ The notebooks requires a number of python packages: numpy, matplotlib, pandas, g
 
 The notebooks were used to complete the analysis and make figures for the following manuscript: 
 
-Luijendijk, E., Winter, T., Köhler, S., Ferguson, G., von Hagke, C., & Scibek, J. (2020). Using thermal springs to quantify deep groundwater flow and its thermal footprint in the Alps and North American orogens. EarthArxiv. https://doi.org/10.31223/osf.io/364dj
+Luijendijk, E., Winter, T., Köhler, S., Ferguson, G., von Hagke, C., & Scibek, J. (2020). Using thermal springs to quantify deep groundwater flow and its thermal footprint in the Alps and a comparison with North American orogens. Geophysical Research Letters, 47, e2020GL090134. https://doi.org/10.1029/2020GL090134 
 
 Please cite this publication if you publish any work based on these notebooks or the thermal spring database.
 
