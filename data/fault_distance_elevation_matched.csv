@@ -1,0 +1,3 @@
+comparison,n points,median elevation (m),median elevation springs (m),median distance to fault (km),median distance to fault springs (km),p-value elevation Kolmogorov-Smirnov,p-value distance Kolmogorov-Smirnov,p-value distance Mann-Whitney U
+all random points,5000,1068,655,14.47,8.97,8.15e-19,9.027e-07,0.002266
+elevation-matched random points,2890,668,655,15.04,8.97,0.813,8.514e-06,0.0004364
