@@ -1,0 +1,7 @@
+distance to nearest fault,n_random_points,median_elevation,median_height_above_ws_min
+0-2 km,439,805,305
+2-5 km,604,1108,555
+5-10 km,848,1154,616.5
+10-20 km,1271,1270,682
+20-50 km,1459,1162,572
+50-200 km,379,206,108
